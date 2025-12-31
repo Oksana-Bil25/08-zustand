@@ -1,0 +1,40 @@
+.layoutContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #0f0f0f;
+}
+
+.sidebarArea {
+  width: 250px;
+  border-right: 1px solid #333;
+  padding: 20px;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 20px;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navItem {
+  color: #888;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.navItem:hover {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.active {
+  background-color: #0d6efd;
+  color: #fff !important;
+}
