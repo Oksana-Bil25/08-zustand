@@ -5,9 +5,35 @@ import {
 } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
 import NotesClient from "./Notes.client";
+import { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const tagFromUrl = slug?.[0] || "all";
+
+  const displayTag = tagFromUrl.charAt(0).toUpperCase() + tagFromUrl.slice(1);
+
+  return {
+    title: `Notes: ${displayTag} | NoteHub`,
+    description: `Browse all notes filtered by category: ${displayTag}`,
+    openGraph: {
+      title: `Notes: ${displayTag} | NoteHub`,
+      description: `Browse all notes filtered by category: ${displayTag}`,
+      url: `https://08-zustand-seven.vercel.app/notes/filter/${tagFromUrl}`,
+      images: [
+        {
+          url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+          alt: `NoteHub ${displayTag} Category`,
+        },
+      ],
+    },
+  };
 }
 
 export default async function FilteredNotesPage({ params }: PageProps) {

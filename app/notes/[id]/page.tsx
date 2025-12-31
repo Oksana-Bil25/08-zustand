@@ -6,12 +6,41 @@ import {
 } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
 import NoteDetailsClient from "./NoteDetails.client";
+import { Metadata } from "next";
 
-export default async function NotePage({
-  params,
-}: {
+interface Props {
   params: Promise<{ id: string }>;
-}) {
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const note = await fetchNoteById(id);
+
+    return {
+      title: `${note.title} | NoteHub`,
+      description: note.content.substring(0, 150),
+      openGraph: {
+        title: note.title,
+        description: note.content.substring(0, 150),
+        url: `https://08-zustand-seven.vercel.app/notes/${id}`,
+        images: [
+          {
+            url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+            alt: note.title,
+          },
+        ],
+      },
+    };
+  } catch {
+    return {
+      title: "Note Not Found | NoteHub",
+    };
+  }
+}
+
+export default async function NotePage({ params }: Props) {
   const { id } = await params;
   const queryClient = new QueryClient();
 
@@ -26,7 +55,9 @@ export default async function NotePage({
 
   const state = dehydrate(queryClient);
 
-  if (!state.queries.length) return notFound();
+  const noteData = state.queries.find((q) => q.queryKey[0] === "note")?.state
+    .data;
+  if (!noteData) return notFound();
 
   return (
     <HydrationBoundary state={state}>

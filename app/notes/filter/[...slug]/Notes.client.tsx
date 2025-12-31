@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchNotes, deleteNote } from "@/lib/api";
 import { useDebounce } from "@/components/hooks/useDebounce";
 import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
 import SearchBox from "@/components/SearchBox/SearchBox";
-import Modal from "@/components/Modal/Modal";
-import NoteForm from "@/components/NoteForm/NoteForm";
 import styles from "./NotesPage.module.css";
 
 interface NotesClientProps {
@@ -18,7 +17,6 @@ interface NotesClientProps {
 export default function NotesClient({ tag }: NotesClientProps) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(search, 500);
@@ -39,9 +37,6 @@ export default function NotesClient({ tag }: NotesClientProps) {
   const handleDelete = (id: string) => {
     if (confirm("Delete this note?")) deleteMutation.mutate(id);
   };
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   if (isLoading) return <div className={styles.app}>Loading...</div>;
   if (isError) return <div className={styles.app}>Error loading notes.</div>;
@@ -65,29 +60,16 @@ export default function NotesClient({ tag }: NotesClientProps) {
             />
           )}
         </div>
-        <button onClick={openModal} className={styles.button}>
+
+        <Link href="/notes/action/create" className={styles.button}>
           Create note +
-        </button>
+        </Link>
       </header>
 
       {data && data.notes.length > 0 ? (
         <NoteList notes={data.notes} onDelete={handleDelete} />
       ) : (
         <p className={styles.empty}>No notes found.</p>
-      )}
-
-      {isModalOpen && (
-        <Modal onClose={closeModal}>
-          <NoteForm
-            onClose={closeModal}
-            defaultValues={{
-              tag:
-                tag && tag !== "all"
-                  ? tag.charAt(0).toUpperCase() + tag.slice(1)
-                  : "Todo",
-            }}
-          />
-        </Modal>
       )}
     </div>
   );

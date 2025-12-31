@@ -1,36 +1,33 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { noteInstance } from "@/lib/api";
+import { useNoteStore } from "@/lib/store/noteStore";
 import css from "./NoteForm.module.css";
 
-export interface NoteFormData {
-  title: string;
-  content: string;
-  tag: string;
-}
-
-interface NoteFormProps {
-  onClose?: () => void;
-  defaultValues?: Partial<NoteFormData>;
-}
-
-const NoteForm = ({ onClose, defaultValues }: NoteFormProps) => {
+const NoteForm = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<NoteFormData>({
-    defaultValues: defaultValues || { title: "", content: "", tag: "Todo" },
-  });
+
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  const { draft, setDraft, clearDraft } = useNoteStore();
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const mutation = useMutation({
-    mutationFn: async (newNote: NoteFormData) => {
+    mutationFn: async (newNote: typeof draft) => {
       const { data } = await noteInstance.post("/notes", newNote);
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      reset();
-      if (onClose) onClose();
+      clearDraft();
+      router.back();
     },
     onError: (error) => {
       console.error("Error saving note:", error);
@@ -38,30 +35,56 @@ const NoteForm = ({ onClose, defaultValues }: NoteFormProps) => {
     },
   });
 
-  return (
-    <form
-      className={css.form}
-      onSubmit={handleSubmit((data) => mutation.mutate(data))}
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
+  ) => {
+    const { name, value } = e.target;
+    setDraft({ [name]: value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate(draft);
+  };
+
+  if (!isHydrated) return null;
+
+  return (
+    <form className={css.form} onSubmit={handleSubmit}>
       <div className={css.field}>
         <label className={css.label}>Title</label>
         <input
+          name="title"
           className={css.input}
-          {...register("title", { required: true })}
+          value={draft.title}
+          onChange={handleChange}
+          required
+          placeholder="Enter title..."
         />
       </div>
 
       <div className={css.field}>
         <label className={css.label}>Content</label>
         <textarea
+          name="content"
           className={css.textarea}
-          {...register("content", { required: true })}
+          value={draft.content}
+          onChange={handleChange}
+          required
+          placeholder="Write your note here..."
         />
       </div>
 
       <div className={css.field}>
         <label className={css.label}>Tag</label>
-        <select className={css.select} {...register("tag")}>
+        <select
+          name="tag"
+          className={css.select}
+          value={draft.tag}
+          onChange={handleChange}
+        >
           <option value="Todo">Todo</option>
           <option value="Work">Work</option>
           <option value="Personal">Personal</option>
@@ -74,7 +97,7 @@ const NoteForm = ({ onClose, defaultValues }: NoteFormProps) => {
         <button
           type="button"
           className={css.buttonCancel}
-          onClick={onClose}
+          onClick={() => router.back()}
           disabled={mutation.isPending}
         >
           Cancel
