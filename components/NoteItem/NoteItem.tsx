@@ -2,14 +2,34 @@
 
 import Link from "next/link";
 import { Note } from "@/types/note";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteNote } from "@/lib/api";
 import css from "./NoteItem.module.css";
 
 interface NoteItemProps {
   note: Note;
-  onDelete: () => void;
 }
 
-export default function NoteItem({ note, onDelete }: NoteItemProps) {
+export default function NoteItem({ note }: NoteItemProps) {
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: () => {
+      alert("Не вдалося видалити нотатку.");
+    },
+  });
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (confirm("Видалити цю нотатку?")) {
+      deleteMutation.mutate(note.id);
+    }
+  };
+
   return (
     <div className={css.listItem}>
       <div className={css.contentWrapper}>
@@ -31,15 +51,11 @@ export default function NoteItem({ note, onDelete }: NoteItemProps) {
 
           <button
             className={css.button}
-            onClick={(e) => {
-              e.preventDefault();
-              if (confirm("Видалити цю нотатку?")) {
-                onDelete();
-              }
-            }}
+            onClick={handleDelete}
             type="button"
+            disabled={deleteMutation.isPending}
           >
-            Delete
+            {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </button>
         </div>
       </div>

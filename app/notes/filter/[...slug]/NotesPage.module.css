@@ -87,3 +87,10 @@
     transform: translateY(0);
   }
 }
+
+.empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #6b7280;
+  margin-top: 50px;
+}

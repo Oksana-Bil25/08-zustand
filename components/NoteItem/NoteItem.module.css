@@ -1,67 +1,100 @@
 .listItem {
   background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  min-height: 180px;
+  min-height: 200px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.listItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.contentWrapper {
+  flex-grow: 1;
 }
 
 .title {
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-  font-weight: 600;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
 }
 
 .content {
-  flex-grow: 1;
-  margin-bottom: 12px;
-  color: #374151;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  overflow: hidden;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #f3f4f6;
   margin-top: auto;
+}
+
+.tag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .detailsLink {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: #2563eb;
   text-decoration: none;
-  white-space: nowrap;
+  transition: color 0.2s;
 }
 
-.tag {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  background: #ebeef3;
-  border-radius: 999px;
-  color: #4b5563;
+.detailsLink:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .button {
-  background: #ef4444;
-  color: #fff;
+  background: #fee2e2;
+  color: #ef4444;
   border: none;
-  padding: 4px 8px;
-  font-size: 0.75rem;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.button:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
